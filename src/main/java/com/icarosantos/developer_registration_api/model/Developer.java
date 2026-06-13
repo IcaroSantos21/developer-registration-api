@@ -25,8 +25,8 @@ public abstract class Developer {
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
-    
-    private String Enterprise;
+
+    private String enterprise;
 
     @Column(precision = 10, scale = 2)
     private BigDecimal salary;
