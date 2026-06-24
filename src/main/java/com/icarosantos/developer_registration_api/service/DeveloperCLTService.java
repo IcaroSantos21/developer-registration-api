@@ -57,12 +57,12 @@ public class DeveloperCLTService {
         developerCLTRepository.save(developerCLT);
     }
 
-    public Optional<DeveloperCLT> findById(Long id) {
-        return developerCLTRepository.findById(id);
-    }
-
     public List<DeveloperCLT> findAll() {
         return developerCLTRepository.findAll();
+    }
+
+    public Optional<DeveloperCLT> findById(Long id) {
+        return developerCLTRepository.findById(id);
     }
 
     public void update(Long id, DeveloperRequest developerRequest) {
