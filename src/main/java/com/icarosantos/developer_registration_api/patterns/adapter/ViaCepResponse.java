@@ -1,4 +1,4 @@
-package com.icarosantos.developer_registration_api.patterns.Addapter;
+package com.icarosantos.developer_registration_api.patterns.adapter;
 
 import com.icarosantos.developer_registration_api.model.Address;
 

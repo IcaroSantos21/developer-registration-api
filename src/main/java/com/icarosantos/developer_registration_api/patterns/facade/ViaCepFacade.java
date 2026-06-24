@@ -1,7 +1,6 @@
 package com.icarosantos.developer_registration_api.patterns.facade;
 
-import com.icarosantos.developer_registration_api.model.Address;
-import com.icarosantos.developer_registration_api.patterns.Addapter.ViaCepResponse;
+import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
