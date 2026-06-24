@@ -22,6 +22,4 @@ public class DeveloperCLT extends Developer {
     private LocalDate admissionDate;
 
     private boolean thirteenSalary;
-
-    private boolean paidVacation;
 }

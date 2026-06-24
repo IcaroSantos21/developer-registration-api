@@ -38,9 +38,10 @@ public abstract class Developer {
     private TypeContract typeContract;
 
     @Column(name = "holiday_date")
-    private LocalDate holidayDate;
+    private LocalDate vacationDate;
 
     @Embedded
     private Address address;
 
+    private boolean paidVacation;
 }

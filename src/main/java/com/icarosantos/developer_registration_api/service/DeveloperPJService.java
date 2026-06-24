@@ -2,12 +2,12 @@ package com.icarosantos.developer_registration_api.service;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
 import com.icarosantos.developer_registration_api.model.Address;
-import com.icarosantos.developer_registration_api.model.DeveloperCLT;
+import com.icarosantos.developer_registration_api.model.DeveloperPJ;
 import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
 import com.icarosantos.developer_registration_api.patterns.facade.ViaCepFacade;
 import com.icarosantos.developer_registration_api.patterns.factory.ContractFactory;
 import com.icarosantos.developer_registration_api.patterns.strategy.ContractStrategy;
-import com.icarosantos.developer_registration_api.repository.DeveloperCLTRepository;
+import com.icarosantos.developer_registration_api.repository.DeveloperPJRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,30 +15,27 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
-public class DeveloperCLTService {
+public class DeveloperPJService {
     @Autowired
-    private ViaCepFacade viaCepFacade;
+    ViaCepFacade viaCepFacade;
 
     @Autowired
-    private DeveloperCLTRepository developerCLTRepository;
+    DeveloperPJRepository developerPJRepository;
 
-    // Metodo para criar um novo usuário
     public void create(DeveloperRequest developerRequest) {
-        // Pegando o endereço do usuário
+        // Pegando o endereço do usuario
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
         Address address = viaCepResponse.toAddress();
 
-        // Definindo o Strategy
+        // Definindo o strategy
         ContractStrategy contractStrategy = ContractFactory.create(developerRequest.getTypeContract());
 
-        // Pegando hasThirteenSalary e o hasPaidVacation
+        // Pegando os dados do strategy
         boolean hasThirteenSalary = contractStrategy.hasThirteenSalary();
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
-        // Montando a entidade
-        DeveloperCLT developerCLT = DeveloperCLT.builder()
+        DeveloperPJ developerPJ = DeveloperPJ.builder()
                 .firstName(developerRequest.getFirstName())
                 .lastName(developerRequest.getLastName())
                 .birthDate(developerRequest.getBirthDate())
@@ -48,27 +45,27 @@ public class DeveloperCLTService {
                 .typeContract(developerRequest.getTypeContract())
                 .vacationDate(developerRequest.getHolidayDate())
                 .address(address)
-                .admissionDate(developerRequest.getAdmissionDate())
-                .thirteenSalary(hasThirteenSalary)
+                .contractStartDate(developerRequest.getContractStartDate())
+                .contractPeriod(developerRequest.getContractPeriod())
                 .paidVacation(hasPaidVacation)
                 .build();
 
-        // Salvando no repository
-        developerCLTRepository.save(developerCLT);
+        // Salvando no repositório
+        developerPJRepository.save(developerPJ);
     }
 
-    public Optional<DeveloperCLT> findById(Long id) {
-        return developerCLTRepository.findById(id);
+    public Optional<DeveloperPJ> findById(Long id){
+        return developerPJRepository.findById(id);
     }
 
-    public List<DeveloperCLT> findAll() {
-        return developerCLTRepository.findAll();
+    public List<DeveloperPJ> findAll() {
+        return developerPJRepository.findAll();
     }
 
     public void update(Long id, DeveloperRequest developerRequest) {
-        Optional<DeveloperCLT> developerCLT = findById(id);
+        Optional<DeveloperPJ> developerPJ = findById(id);
 
-        if (developerCLT.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
+        if (developerPJ.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
 
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
         Address address = viaCepResponse.toAddress();
@@ -78,21 +75,23 @@ public class DeveloperCLTService {
         boolean hasThirteenSalary = contractStrategy.hasThirteenSalary();
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
-        developerCLT.get().setEnterprise(developerRequest.getEnterprise());
-        developerCLT.get().setSalary(developerRequest.getSalary());
-        developerCLT.get().setTypeContract(developerRequest.getTypeContract());
-        developerCLT.get().setVacationDate(developerRequest.getHolidayDate());
-        developerCLT.get().setAddress(address);
-        developerCLT.get().setThirteenSalary(hasThirteenSalary);
-        developerCLT.get().setPaidVacation(hasPaidVacation);
+        developerPJ.get().setEnterprise(developerRequest.getEnterprise());
+        developerPJ.get().setSalary(developerRequest.getSalary());
+        developerPJ.get().setTypeContract(developerRequest.getTypeContract());
+        developerPJ.get().setVacationDate(developerRequest.getHolidayDate());
+        developerPJ.get().setAddress(address);
+        developerPJ.get().setPaidVacation(hasPaidVacation);
+        developerPJ.get().setContractPeriod(developerRequest.getContractPeriod());
 
-        developerCLTRepository.save(developerCLT.get());
+        developerPJRepository.save(developerPJ.get());
     }
 
     public void delete(Long id) {
-        Optional<DeveloperCLT> developerCLT = findById(id);
-        if (developerCLT.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
+        Optional<DeveloperPJ> developerPJ = findById(id);
 
-        developerCLTRepository.delete(developerCLT.get());
+        if (developerPJ.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
+
+        developerPJRepository.delete(developerPJ.get());
     }
+
 }
