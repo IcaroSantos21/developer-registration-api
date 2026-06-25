@@ -14,7 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Address {
 
-    @Id
     private String zipCode;
     private String street;
     private String complement;
