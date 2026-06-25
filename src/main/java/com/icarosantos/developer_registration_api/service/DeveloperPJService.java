@@ -66,18 +66,18 @@ public class DeveloperPJService {
         Optional<DeveloperPJ> developerPJ = findById(id);
 
         if (developerPJ.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
+        if (developerPJ.get().getTypeContract() != developerRequest.getTypeContract()) throw new
+                IllegalArgumentException("Tipo de Contrato não pode ser alterado");
 
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
         Address address = viaCepResponse.toAddress();
 
         ContractStrategy contractStrategy = ContractFactory.create(developerRequest.getTypeContract());
 
-        boolean hasThirteenSalary = contractStrategy.hasThirteenSalary();
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
         developerPJ.get().setEnterprise(developerRequest.getEnterprise());
         developerPJ.get().setSalary(developerRequest.getSalary());
-        developerPJ.get().setTypeContract(developerRequest.getTypeContract());
         developerPJ.get().setVacationDate(developerRequest.getHolidayDate());
         developerPJ.get().setAddress(address);
         developerPJ.get().setPaidVacation(hasPaidVacation);

@@ -69,6 +69,8 @@ public class DeveloperCLTService {
         Optional<DeveloperCLT> developerCLT = findById(id);
 
         if (developerCLT.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
+        if (developerCLT.get().getTypeContract() != developerRequest.getTypeContract()) throw new
+                IllegalArgumentException("Tipo de Contrato não pode ser alterado");
 
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
         Address address = viaCepResponse.toAddress();
@@ -80,7 +82,6 @@ public class DeveloperCLTService {
 
         developerCLT.get().setEnterprise(developerRequest.getEnterprise());
         developerCLT.get().setSalary(developerRequest.getSalary());
-        developerCLT.get().setTypeContract(developerRequest.getTypeContract());
         developerCLT.get().setVacationDate(developerRequest.getHolidayDate());
         developerCLT.get().setAddress(address);
         developerCLT.get().setThirteenSalary(hasThirteenSalary);
