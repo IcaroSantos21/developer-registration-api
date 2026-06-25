@@ -1,6 +1,7 @@
 package com.icarosantos.developer_registration_api.controller;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
+import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.DeveloperCLT;
 import com.icarosantos.developer_registration_api.service.DeveloperCLTService;
 import lombok.RequiredArgsConstructor;
@@ -23,13 +24,13 @@ public class DeveloperCLTController {
     }
 
     @GetMapping("/clt")
-    public ResponseEntity<List<DeveloperCLT>> findAll() {
+    public ResponseEntity<List<DeveloperResponse>> findAll() {
         return ResponseEntity.ok(developerCLTService.findAll());
     }
 
     @GetMapping("/clt/{id}")
-    public ResponseEntity<DeveloperCLT> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(developerCLTService.findById(id).get());
+    public ResponseEntity<DeveloperResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(developerCLTService.findById(id));
     }
 
     @PutMapping("/clt/{id}")

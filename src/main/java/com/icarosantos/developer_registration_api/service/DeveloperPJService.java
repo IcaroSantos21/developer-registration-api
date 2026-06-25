@@ -1,6 +1,7 @@
 package com.icarosantos.developer_registration_api.service;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
+import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperPJ;
 import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
@@ -12,6 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +35,6 @@ public class DeveloperPJService {
         ContractStrategy contractStrategy = ContractFactory.create(developerRequest.getTypeContract());
 
         // Pegando os dados do strategy
-        boolean hasThirteenSalary = contractStrategy.hasThirteenSalary();
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
         DeveloperPJ developerPJ = DeveloperPJ.builder()
@@ -43,7 +45,7 @@ public class DeveloperPJService {
                 .salary(developerRequest.getSalary())
                 .typeDeveloper(developerRequest.getTypeDeveloper())
                 .typeContract(developerRequest.getTypeContract())
-                .vacationDate(developerRequest.getHolidayDate())
+                .vacationDate(developerRequest.getVacationDate())
                 .address(address)
                 .contractStartDate(developerRequest.getContractStartDate())
                 .contractPeriod(developerRequest.getContractPeriod())
@@ -54,19 +56,18 @@ public class DeveloperPJService {
         developerPJRepository.save(developerPJ);
     }
 
-    public Optional<DeveloperPJ> findById(Long id){
-        return developerPJRepository.findById(id);
+    public DeveloperResponse findById(Long id){
+        return toResponse(developerPJRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado")));
     }
 
-    public List<DeveloperPJ> findAll() {
-        return developerPJRepository.findAll();
+    public List<DeveloperResponse> findAll() {
+        var listDevelopers = developerPJRepository.findAll();
+        return listDevelopers.stream().map(this::toResponse).toList();
     }
 
     public void update(Long id, DeveloperRequest developerRequest) {
-        Optional<DeveloperPJ> developerPJ = findById(id);
-
-        if (developerPJ.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
-        if (developerPJ.get().getTypeContract() != developerRequest.getTypeContract()) throw new
+        DeveloperPJ developerPJ = findEntityById(id);
+        if (developerPJ.getTypeContract() != developerRequest.getTypeContract()) throw new
                 IllegalArgumentException("Tipo de Contrato não pode ser alterado");
 
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
@@ -76,22 +77,44 @@ public class DeveloperPJService {
 
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
-        developerPJ.get().setEnterprise(developerRequest.getEnterprise());
-        developerPJ.get().setSalary(developerRequest.getSalary());
-        developerPJ.get().setVacationDate(developerRequest.getHolidayDate());
-        developerPJ.get().setAddress(address);
-        developerPJ.get().setPaidVacation(hasPaidVacation);
-        developerPJ.get().setContractPeriod(developerRequest.getContractPeriod());
+        developerPJ.setEnterprise(developerRequest.getEnterprise());
+        developerPJ.setSalary(developerRequest.getSalary());
+        developerPJ.setVacationDate(developerRequest.getVacationDate());
+        developerPJ.setAddress(address);
+        developerPJ.setPaidVacation(hasPaidVacation);
+        developerPJ.setContractPeriod(developerRequest.getContractPeriod());
 
-        developerPJRepository.save(developerPJ.get());
+        developerPJRepository.save(developerPJ);
     }
 
     public void delete(Long id) {
-        Optional<DeveloperPJ> developerPJ = findById(id);
+        DeveloperPJ developerPJ = findEntityById(id);
 
-        if (developerPJ.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
+        developerPJRepository.delete(developerPJ);
+    }
 
-        developerPJRepository.delete(developerPJ.get());
+    public DeveloperResponse toResponse(DeveloperPJ developerPJ) {
+        ContractStrategy contractStrategy = ContractFactory.create(developerPJ.getTypeContract());
+
+        BigDecimal totalBenefits = contractStrategy.calculateTotalBenefits(developerPJ.getSalary());
+        LocalDate contractEndDate = contractStrategy.calculateContractEndDate(developerPJ.getContractStartDate(), developerPJ.getContractPeriod());
+
+        return DeveloperResponse.builder()
+                .id(developerPJ.getId())
+                .fullName(developerPJ.getFirstName() + " " + developerPJ.getLastName())
+                .enterprise(developerPJ.getEnterprise())
+                .salary(developerPJ.getSalary())
+                .typeDeveloper(developerPJ.getTypeDeveloper())
+                .address(developerPJ.getAddress())
+                .vacationDate(developerPJ.getVacationDate())
+                .totalBenefits(totalBenefits)
+                .contractEndDate(contractEndDate)
+                .build();
+    }
+
+    private DeveloperPJ findEntityById (Long id) {
+        return developerPJRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
 
 }

@@ -1,6 +1,7 @@
 package com.icarosantos.developer_registration_api.controller;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
+import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.DeveloperPJ;
 import com.icarosantos.developer_registration_api.service.DeveloperPJService;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +25,13 @@ public class DeveloperPJController {
     }
 
     @GetMapping("/pj")
-    public ResponseEntity<List<DeveloperPJ>> findAll() {
+    public ResponseEntity<List<DeveloperResponse>> findAll() {
         return ResponseEntity.ok(developerPJService.findAll());
     }
 
     @GetMapping("/pj/{id}")
-    public ResponseEntity<DeveloperPJ> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(developerPJService.findById(id).get());
+    public ResponseEntity<DeveloperResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(developerPJService.findById(id));
     }
 
     @PutMapping("/pj/{id}")

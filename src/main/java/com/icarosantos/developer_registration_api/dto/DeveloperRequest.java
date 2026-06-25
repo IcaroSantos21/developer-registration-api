@@ -24,7 +24,7 @@ public class DeveloperRequest {
     private BigDecimal salary;
     private TypeDeveloper typeDeveloper;
     private TypeContract typeContract;
-    private LocalDate holidayDate;
+    private LocalDate vacationDate;
     private String cep;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

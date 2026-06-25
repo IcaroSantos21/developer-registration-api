@@ -1,6 +1,7 @@
 package com.icarosantos.developer_registration_api.service;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
+import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperCLT;
 import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
@@ -12,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +48,7 @@ public class DeveloperCLTService {
                 .salary(developerRequest.getSalary())
                 .typeDeveloper(developerRequest.getTypeDeveloper())
                 .typeContract(developerRequest.getTypeContract())
-                .vacationDate(developerRequest.getHolidayDate())
+                .vacationDate(developerRequest.getVacationDate())
                 .address(address)
                 .admissionDate(developerRequest.getAdmissionDate())
                 .thirteenSalary(hasThirteenSalary)
@@ -57,19 +59,20 @@ public class DeveloperCLTService {
         developerCLTRepository.save(developerCLT);
     }
 
-    public List<DeveloperCLT> findAll() {
-        return developerCLTRepository.findAll();
+    public List<DeveloperResponse> findAll() {
+        var listDevelopers = developerCLTRepository.findAll();
+        return listDevelopers.stream().map(this::toResponse).toList();
     }
 
-    public Optional<DeveloperCLT> findById(Long id) {
-        return developerCLTRepository.findById(id);
+    public DeveloperResponse findById(Long id) {
+         DeveloperResponse developerResponse = toResponse(developerCLTRepository.findById(id).orElseThrow());
+         return developerResponse;
     }
 
     public void update(Long id, DeveloperRequest developerRequest) {
-        Optional<DeveloperCLT> developerCLT = findById(id);
+        DeveloperCLT developerCLT = findEntityById(id);
 
-        if (developerCLT.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
-        if (developerCLT.get().getTypeContract() != developerRequest.getTypeContract()) throw new
+        if (developerCLT.getTypeContract() != developerRequest.getTypeContract()) throw new
                 IllegalArgumentException("Tipo de Contrato não pode ser alterado");
 
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
@@ -80,20 +83,41 @@ public class DeveloperCLTService {
         boolean hasThirteenSalary = contractStrategy.hasThirteenSalary();
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
-        developerCLT.get().setEnterprise(developerRequest.getEnterprise());
-        developerCLT.get().setSalary(developerRequest.getSalary());
-        developerCLT.get().setVacationDate(developerRequest.getHolidayDate());
-        developerCLT.get().setAddress(address);
-        developerCLT.get().setThirteenSalary(hasThirteenSalary);
-        developerCLT.get().setPaidVacation(hasPaidVacation);
+        developerCLT.setEnterprise(developerRequest.getEnterprise());
+        developerCLT.setSalary(developerRequest.getSalary());
+        developerCLT.setVacationDate(developerRequest.getVacationDate());
+        developerCLT.setAddress(address);
+        developerCLT.setThirteenSalary(hasThirteenSalary);
+        developerCLT.setPaidVacation(hasPaidVacation);
 
-        developerCLTRepository.save(developerCLT.get());
+        developerCLTRepository.save(developerCLT);
     }
 
     public void delete(Long id) {
-        Optional<DeveloperCLT> developerCLT = findById(id);
-        if (developerCLT.isEmpty()) throw new EntityNotFoundException("Usuário não encontrado");
+        DeveloperCLT developerCLT = findEntityById(id);
 
-        developerCLTRepository.delete(developerCLT.get());
+        developerCLTRepository.delete(developerCLT);
+    }
+
+    public DeveloperResponse toResponse(DeveloperCLT developerCLT) {
+        ContractStrategy contractStrategy = ContractFactory.create(developerCLT.getTypeContract());
+
+        BigDecimal totalBenefits = contractStrategy.calculateTotalBenefits(developerCLT.getSalary());
+
+        return DeveloperResponse.builder()
+                .id(developerCLT.getId())
+                .fullName(developerCLT.getFirstName() + " " + developerCLT.getLastName())
+                .enterprise(developerCLT.getEnterprise())
+                .salary(developerCLT.getSalary())
+                .typeDeveloper(developerCLT.getTypeDeveloper())
+                .address(developerCLT.getAddress())
+                .vacationDate(developerCLT.getVacationDate())
+                .totalBenefits(totalBenefits)
+                .build();
+    }
+
+    private DeveloperCLT findEntityById(Long id) {
+        return developerCLTRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
     }
 }
