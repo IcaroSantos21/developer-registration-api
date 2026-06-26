@@ -1,6 +1,7 @@
 package com.icarosantos.developer_registration_api.patterns.strategy;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 
 public class CltStrategy implements ContractStrategy{
@@ -16,7 +17,7 @@ public class CltStrategy implements ContractStrategy{
 
     @Override
     public BigDecimal calculateTotalBenefits(BigDecimal salary) {
-        BigDecimal totalBenefits = salary.divide(new BigDecimal("3")).add(salary);
+        BigDecimal totalBenefits = salary.divide(new BigDecimal("3"), 2, RoundingMode.HALF_UP).add(salary);
         return totalBenefits;
 
     }

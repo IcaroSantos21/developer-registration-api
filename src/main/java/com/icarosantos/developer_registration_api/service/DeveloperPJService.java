@@ -5,12 +5,14 @@ import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperPJ;
 import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
+import com.icarosantos.developer_registration_api.patterns.event.DeveloperRegisteredEvent;
 import com.icarosantos.developer_registration_api.patterns.facade.ViaCepFacade;
 import com.icarosantos.developer_registration_api.patterns.factory.ContractFactory;
 import com.icarosantos.developer_registration_api.patterns.strategy.ContractStrategy;
 import com.icarosantos.developer_registration_api.repository.DeveloperPJRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +27,9 @@ public class DeveloperPJService {
 
     @Autowired
     DeveloperPJRepository developerPJRepository;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     public void create(DeveloperRequest developerRequest) {
         // Pegando o endereço do usuario
@@ -54,6 +59,12 @@ public class DeveloperPJService {
 
         // Salvando no repositório
         developerPJRepository.save(developerPJ);
+
+        applicationEventPublisher.publishEvent(new DeveloperRegisteredEvent(
+                developerPJ.getFirstName() + " " + developerPJ.getLastName(),
+                developerPJ.getEnterprise(),
+                developerPJ.getTypeContract()
+        ));
     }
 
     public DeveloperResponse findById(Long id){

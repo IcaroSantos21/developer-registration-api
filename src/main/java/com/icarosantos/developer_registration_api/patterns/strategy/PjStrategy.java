@@ -1,6 +1,7 @@
 package com.icarosantos.developer_registration_api.patterns.strategy;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 
 public class PjStrategy implements ContractStrategy{
@@ -22,7 +23,7 @@ public class PjStrategy implements ContractStrategy{
 
     @Override
     public BigDecimal calculateTotalBenefits(BigDecimal salary) {
-        BigDecimal totalBenefits = salary.divide(new BigDecimal("3"));
+        BigDecimal totalBenefits = salary.divide(new BigDecimal("3"), 2, RoundingMode.HALF_UP);
         return totalBenefits;
     }
 }

@@ -5,12 +5,14 @@ import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperCLT;
 import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
+import com.icarosantos.developer_registration_api.patterns.event.DeveloperRegisteredEvent;
 import com.icarosantos.developer_registration_api.patterns.facade.ViaCepFacade;
 import com.icarosantos.developer_registration_api.patterns.factory.ContractFactory;
 import com.icarosantos.developer_registration_api.patterns.strategy.ContractStrategy;
 import com.icarosantos.developer_registration_api.repository.DeveloperCLTRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,6 +27,9 @@ public class DeveloperCLTService {
 
     @Autowired
     private DeveloperCLTRepository developerCLTRepository;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     // Metodo para criar um novo usuário
     public void create(DeveloperRequest developerRequest) {
@@ -57,6 +62,11 @@ public class DeveloperCLTService {
 
         // Salvando no repository
         developerCLTRepository.save(developerCLT);
+        applicationEventPublisher.publishEvent(new DeveloperRegisteredEvent(
+                developerCLT.getFirstName() + " " + developerCLT.getLastName(),
+                developerCLT.getEnterprise(),
+                developerCLT.getTypeContract()
+        ));
     }
 
     public List<DeveloperResponse> findAll() {
