@@ -1,7 +1,6 @@
 package com.icarosantos.developer_registration_api;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperCLTRequest;
-import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperCLT;
@@ -158,5 +157,41 @@ public class DeveloperCLTServiceTest {
 
         // Assert - verifica o resultado
         assertEquals(1, list.size());
+    }
+
+    @Test
+    void shouldDeleteDeveloperCLTWhenIdExists() {
+        // Arrange - Monta os dados e os mocks
+        Address address = new Address(
+                "06843160",
+                "Rua Padre Antonio",
+                "Casa mais bonita",
+                "Maria Auxiliadora",
+                "Embu das Artes",
+                "São Paulo");
+
+        DeveloperCLT developerCLT = DeveloperCLT.builder()
+                .id(1L)
+                .firstName("Icaro")
+                .lastName("Rodrigues")
+                .birthDate(LocalDate.of(2006, 12, 13))
+                .enterprise("AWS")
+                .salary(new BigDecimal(10000))
+                .typeDeveloper(TypeDeveloper.BACK)
+                .typeContract(TypeContract.CLT)
+                .vacationDate(LocalDate.of(2027, 07, 01))
+                .address(address)
+                .paidVacation(true)
+                .admissionDate(LocalDate.of(2026, 06, 27)).
+                thirteenSalary(true)
+                .build();
+
+        when(developerCLTRepository.findById(1L)).thenReturn(Optional.of(developerCLT));
+
+        // Act - chama o metodo
+        developerCLTService.delete(1L);
+
+        // Assert - verifica o resultado
+        verify(developerCLTRepository).delete(any(DeveloperCLT.class));
     }
 }
