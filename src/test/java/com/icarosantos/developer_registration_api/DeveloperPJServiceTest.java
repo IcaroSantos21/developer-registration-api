@@ -108,4 +108,16 @@ public class DeveloperPJServiceTest {
         // Assert - verifica o resultado
         assertEquals(developerResponse.getFullName(), "Icaro Rodrigues");
     }
+
+    @Test
+    void shouldThrowExceptionWhenIdNotFound() {
+        // Arrange - Monta os dados e os mocks
+        when(developerPJRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // Act - chama o metodo
+        // Assert - verifica o resultado
+
+        assertThrows(EntityNotFoundException.class, () ->
+                developerPJService.findById(99L));
+    }
 }
