@@ -2,7 +2,10 @@ package com.icarosantos.developer_registration_api;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperCLTRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
+import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
+import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperCLT;
+import com.icarosantos.developer_registration_api.model.TypeContract;
 import com.icarosantos.developer_registration_api.model.TypeDeveloper;
 import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
 import com.icarosantos.developer_registration_api.patterns.facade.ViaCepFacade;
@@ -13,11 +16,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationEventPublisher;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -67,5 +71,41 @@ public class DeveloperCLTServiceTest {
 
         // Assert - verifica o resultado
         verify(developerCLTRepository).save(any(DeveloperCLT.class));
+    }
+
+    @Test
+    void shouldReturnDeveloperResponseWhenIdExists() {
+        // Arrange - Monta os dados e os mocks
+        Address address = new Address(
+                "06843160",
+                "Rua Padre Antonio",
+                "Casa mais bonita",
+                "Maria Auxiliadora",
+                "Embu das Artes",
+                "São Paulo");
+
+        DeveloperCLT developerCLT = DeveloperCLT.builder()
+                .id(1L)
+                .firstName("Icaro")
+                .lastName("Rodrigues")
+                .birthDate(LocalDate.of(2006, 12, 13))
+                .enterprise("AWS")
+                .salary(new BigDecimal(10000))
+                .typeDeveloper(TypeDeveloper.BACK)
+                .typeContract(TypeContract.CLT)
+                .vacationDate(LocalDate.of(2027, 07, 01))
+                .address(address)
+                .paidVacation(true)
+                .admissionDate(LocalDate.of(2026, 06, 27)).
+                thirteenSalary(true)
+                .build();
+
+        when(developerCLTRepository.findById(1L)).thenReturn(Optional.of(developerCLT));
+
+        // Act - chama o metodo
+        DeveloperResponse developerResponse = developerCLTService.findById(1L);
+
+        // Assert - verifica o resultado
+        assertEquals(developerResponse.getFullName(), "Icaro Rodrigues");
     }
 }
