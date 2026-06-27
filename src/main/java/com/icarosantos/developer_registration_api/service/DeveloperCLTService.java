@@ -19,7 +19,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
-
+/**
+ * Serviço responsável pelo gerenciamento de desenvolvedores com contrato CLT.
+ * Aplica os padrões Strategy, Factory, Builder, Facade e Observer.
+ */
 @Service
 public class DeveloperCLTService {
     @Autowired
@@ -31,7 +34,12 @@ public class DeveloperCLTService {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
-    // Metodo para criar um novo usuário
+    /**
+     * Cadastra um novo desenvolvedor CLT.
+     * Busca o endereço via ViaCEP, aplica as regras contratuais via Strategy e persiste no banco.
+     *
+     * @param developerRequest dados do desenvolvedor a ser cadastrado
+     */
     public void create(DeveloperCLTRequest developerRequest) {
         // Pegando o endereço do usuário
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
@@ -69,17 +77,36 @@ public class DeveloperCLTService {
         ));
     }
 
+    /**
+     * Retorna todos os desenvolvedores CLT cadastrados.
+     *
+     * @return lista de {@link DeveloperResponse} com os dados de todos os desenvolvedores CLT
+     */
     public List<DeveloperResponse> findAll() {
         var listDevelopers = developerCLTRepository.findAll();
         return listDevelopers.stream().map(this::toResponse).toList();
     }
 
+    /**
+     * Busca um desenvolvedor CLT pelo seu identificador.
+     *
+     * @param id identificador do desenvolvedor
+     * @return {@link DeveloperResponse} com os dados do desenvolvedor encontrado
+     * @throws EntityNotFoundException se nenhum desenvolvedor for encontrado com o id informado
+     */
     public DeveloperResponse findById(Long id) {
          DeveloperResponse developerResponse = toResponse(developerCLTRepository.findById(id)
                  .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado")));
          return developerResponse;
     }
 
+    /**
+     * Atualiza os dados de um desenvolvedor CLT existente.
+     *
+     * @param id identificador do desenvolvedor a ser atualizado
+     * @param developerRequest novos dados do desenvolvedor
+     * @throws EntityNotFoundException se nenhum desenvolvedor for encontrado com o id informado
+     */
     public void update(Long id, DeveloperCLTRequest developerRequest) {
         DeveloperCLT developerCLT = findEntityById(id);
 
@@ -101,12 +128,25 @@ public class DeveloperCLTService {
         developerCLTRepository.save(developerCLT);
     }
 
+    /**
+     * Remove um desenvolvedor CLT pelo seu identificador.
+     *
+     * @param id identificador do desenvolvedor a ser removido
+     * @throws EntityNotFoundException se nenhum desenvolvedor for encontrado com o id informado
+     */
     public void delete(Long id) {
         DeveloperCLT developerCLT = findEntityById(id);
 
         developerCLTRepository.delete(developerCLT);
     }
 
+    /**
+     * Converte uma entidade {@link DeveloperCLT} para um {@link DeveloperResponse}.
+     * Calcula os benefícios totais via Strategy.
+     *
+     * @param developerCLT entidade a ser convertida
+     * @return {@link DeveloperResponse} com os dados formatados para resposta
+     */
     public DeveloperResponse toResponse(DeveloperCLT developerCLT) {
         ContractStrategy contractStrategy = ContractFactory.create(developerCLT.getTypeContract());
 
