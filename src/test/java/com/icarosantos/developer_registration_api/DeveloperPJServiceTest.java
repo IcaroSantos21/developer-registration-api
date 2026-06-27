@@ -72,4 +72,40 @@ public class DeveloperPJServiceTest {
         // Assert - verifica o resultado
         verify(developerPJRepository).save(any(DeveloperPJ.class));
     }
+
+    @Test
+    void shouldReturnDeveloperResponseWhenIdExists() {
+        // Arrange - Monta os dados e os mocks
+        Address address = new Address(
+                "06843160",
+                "Rua Padre Antonio",
+                "Casa mais bonita",
+                "Maria Auxiliadora",
+                "Embu das Artes",
+                "São Paulo");
+
+        DeveloperPJ developerPJ = DeveloperPJ.builder()
+                .id(1L)
+                .firstName("Icaro")
+                .lastName("Rodrigues")
+                .birthDate(LocalDate.of(2006, 12, 13))
+                .enterprise("AWS")
+                .salary(new BigDecimal(10000))
+                .typeDeveloper(TypeDeveloper.BACK)
+                .typeContract(TypeContract.CLT)
+                .vacationDate(LocalDate.of(2027, 07, 01))
+                .address(address)
+                .paidVacation(true)
+                .contractStartDate(LocalDate.of(2026, 06, 27))
+                .contractPeriod(1)
+                .build();
+
+        when(developerPJRepository.findById(1L)).thenReturn(Optional.of(developerPJ));
+
+        // Act - chama o metodo
+        DeveloperResponse developerResponse = developerPJService.findById(1L);
+
+        // Assert - verifica o resultado
+        assertEquals(developerResponse.getFullName(), "Icaro Rodrigues");
+    }
 }
