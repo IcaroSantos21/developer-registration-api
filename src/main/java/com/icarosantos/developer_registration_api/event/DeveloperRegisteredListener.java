@@ -1,4 +1,4 @@
-package com.icarosantos.developer_registration_api.patterns.event;
+package com.icarosantos.developer_registration_api.event;
 
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

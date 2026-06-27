@@ -1,4 +1,4 @@
-package com.icarosantos.developer_registration_api.patterns.event;
+package com.icarosantos.developer_registration_api.event;
 
 import com.icarosantos.developer_registration_api.model.TypeContract;
 import lombok.AllArgsConstructor;

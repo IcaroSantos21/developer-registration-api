@@ -1,4 +1,4 @@
-package com.icarosantos.developer_registration_api.patterns.adapter;
+package com.icarosantos.developer_registration_api.integration.viacep;
 
 import com.icarosantos.developer_registration_api.model.Address;
 import lombok.Getter;

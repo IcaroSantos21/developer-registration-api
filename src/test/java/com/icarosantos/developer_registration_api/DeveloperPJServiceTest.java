@@ -1,11 +1,10 @@
 package com.icarosantos.developer_registration_api;
 
-import com.icarosantos.developer_registration_api.dto.DeveloperCLTRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperPJRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.*;
-import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
-import com.icarosantos.developer_registration_api.patterns.facade.ViaCepFacade;
+import com.icarosantos.developer_registration_api.integration.viacep.ViaCepResponse;
+import com.icarosantos.developer_registration_api.integration.viacep.ViaCepFacade;
 import com.icarosantos.developer_registration_api.repository.DeveloperPJRepository;
 import com.icarosantos.developer_registration_api.service.DeveloperPJService;
 import jakarta.persistence.EntityNotFoundException;

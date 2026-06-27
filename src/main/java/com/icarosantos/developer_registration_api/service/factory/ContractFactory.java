@@ -1,9 +1,9 @@
-package com.icarosantos.developer_registration_api.patterns.factory;
+package com.icarosantos.developer_registration_api.service.factory;
 
 import com.icarosantos.developer_registration_api.model.TypeContract;
-import com.icarosantos.developer_registration_api.patterns.strategy.CltStrategy;
-import com.icarosantos.developer_registration_api.patterns.strategy.ContractStrategy;
-import com.icarosantos.developer_registration_api.patterns.strategy.PjStrategy;
+import com.icarosantos.developer_registration_api.service.strategy.CltStrategy;
+import com.icarosantos.developer_registration_api.service.strategy.ContractStrategy;
+import com.icarosantos.developer_registration_api.service.strategy.PjStrategy;
 
 public class ContractFactory {
     public static ContractStrategy create(TypeContract typeContract) {

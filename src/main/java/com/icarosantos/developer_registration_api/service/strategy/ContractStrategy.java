@@ -1,4 +1,4 @@
-package com.icarosantos.developer_registration_api.patterns.strategy;
+package com.icarosantos.developer_registration_api.service.strategy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

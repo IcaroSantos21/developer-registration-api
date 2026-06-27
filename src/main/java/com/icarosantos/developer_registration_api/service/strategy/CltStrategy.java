@@ -1,8 +1,7 @@
-package com.icarosantos.developer_registration_api.patterns.strategy;
+package com.icarosantos.developer_registration_api.service.strategy;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 
 public class CltStrategy implements ContractStrategy{
     @Override
