@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeveloperRequest {
+public abstract class DeveloperRequest {
 
     private String firstName;
     private String lastName;
@@ -26,12 +26,4 @@ public class DeveloperRequest {
     private LocalDate vacationDate;
     private String cep;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private LocalDate admissionDate;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private LocalDate contractStartDate;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer contractPeriod;
 }

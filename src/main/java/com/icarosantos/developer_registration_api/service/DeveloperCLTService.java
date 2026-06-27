@@ -1,6 +1,6 @@
 package com.icarosantos.developer_registration_api.service;
 
-import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
+import com.icarosantos.developer_registration_api.dto.DeveloperCLTRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperCLT;
@@ -32,7 +32,7 @@ public class DeveloperCLTService {
     private ApplicationEventPublisher applicationEventPublisher;
 
     // Metodo para criar um novo usuário
-    public void create(DeveloperRequest developerRequest) {
+    public void create(DeveloperCLTRequest developerRequest) {
         // Pegando o endereço do usuário
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
         Address address = viaCepResponse.toAddress();
@@ -79,7 +79,7 @@ public class DeveloperCLTService {
          return developerResponse;
     }
 
-    public void update(Long id, DeveloperRequest developerRequest) {
+    public void update(Long id, DeveloperCLTRequest developerRequest) {
         DeveloperCLT developerCLT = findEntityById(id);
 
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());

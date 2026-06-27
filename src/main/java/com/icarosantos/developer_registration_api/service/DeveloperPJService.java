@@ -1,6 +1,6 @@
 package com.icarosantos.developer_registration_api.service;
 
-import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
+import com.icarosantos.developer_registration_api.dto.DeveloperPJRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperPJ;
@@ -31,7 +31,7 @@ public class DeveloperPJService {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
-    public void create(DeveloperRequest developerRequest) {
+    public void create(DeveloperPJRequest developerRequest) {
         // Pegando o endereço do usuario
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
         Address address = viaCepResponse.toAddress();
@@ -76,7 +76,7 @@ public class DeveloperPJService {
         return listDevelopers.stream().map(this::toResponse).toList();
     }
 
-    public void update(Long id, DeveloperRequest developerRequest) {
+    public void update(Long id, DeveloperPJRequest developerRequest) {
         DeveloperPJ developerPJ = findEntityById(id);
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
         Address address = viaCepResponse.toAddress();
