@@ -4,6 +4,7 @@ import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperPJ;
+import com.icarosantos.developer_registration_api.model.TypeContract;
 import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepResponse;
 import com.icarosantos.developer_registration_api.patterns.event.DeveloperRegisteredEvent;
 import com.icarosantos.developer_registration_api.patterns.facade.ViaCepFacade;
@@ -18,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DeveloperPJService {
@@ -37,7 +37,7 @@ public class DeveloperPJService {
         Address address = viaCepResponse.toAddress();
 
         // Definindo o strategy
-        ContractStrategy contractStrategy = ContractFactory.create(developerRequest.getTypeContract());
+        ContractStrategy contractStrategy = ContractFactory.create(TypeContract.PJ);
 
         // Pegando os dados do strategy
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
@@ -49,7 +49,7 @@ public class DeveloperPJService {
                 .enterprise(developerRequest.getEnterprise())
                 .salary(developerRequest.getSalary())
                 .typeDeveloper(developerRequest.getTypeDeveloper())
-                .typeContract(developerRequest.getTypeContract())
+                .typeContract(TypeContract.PJ)
                 .vacationDate(developerRequest.getVacationDate())
                 .address(address)
                 .contractStartDate(developerRequest.getContractStartDate())
@@ -78,13 +78,10 @@ public class DeveloperPJService {
 
     public void update(Long id, DeveloperRequest developerRequest) {
         DeveloperPJ developerPJ = findEntityById(id);
-        if (developerPJ.getTypeContract() != developerRequest.getTypeContract()) throw new
-                IllegalArgumentException("Tipo de Contrato não pode ser alterado");
-
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
         Address address = viaCepResponse.toAddress();
 
-        ContractStrategy contractStrategy = ContractFactory.create(developerRequest.getTypeContract());
+        ContractStrategy contractStrategy = ContractFactory.create(TypeContract.PJ);
 
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 

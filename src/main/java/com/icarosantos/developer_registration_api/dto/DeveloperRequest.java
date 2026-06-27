@@ -23,7 +23,6 @@ public class DeveloperRequest {
     private String enterprise;
     private BigDecimal salary;
     private TypeDeveloper typeDeveloper;
-    private TypeContract typeContract;
     private LocalDate vacationDate;
     private String cep;
 
