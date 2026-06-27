@@ -1,5 +1,6 @@
 package com.icarosantos.developer_registration_api.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeveloperPJRequest extends DeveloperRequest{
+
+    @NotNull
     private LocalDate contractStartDate;
+
+    @NotNull
     private Integer contractPeriod;
 }

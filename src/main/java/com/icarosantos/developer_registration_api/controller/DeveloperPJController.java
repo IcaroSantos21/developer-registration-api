@@ -5,6 +5,7 @@ import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.DeveloperPJ;
 import com.icarosantos.developer_registration_api.service.DeveloperPJService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class DeveloperPJController {
     private final DeveloperPJService developerPJService;
 
     @PostMapping("/pj")
-    public ResponseEntity create(@RequestBody DeveloperPJRequest developerRequest) {
+    public ResponseEntity create(@Valid @RequestBody DeveloperPJRequest developerRequest) {
 
         developerPJService.create(developerRequest);
         return ResponseEntity.status(201).build();
@@ -36,7 +37,7 @@ public class DeveloperPJController {
     }
 
     @PutMapping("/pj/{id}")
-    public ResponseEntity update(@PathVariable Long id, @RequestBody DeveloperPJRequest developerRequest) {
+    public ResponseEntity update(@PathVariable Long id, @Valid @RequestBody DeveloperPJRequest developerRequest) {
         developerPJService.update(id, developerRequest);
         return ResponseEntity.status(200).build();
     }

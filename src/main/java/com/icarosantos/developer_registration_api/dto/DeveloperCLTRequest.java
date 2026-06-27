@@ -1,5 +1,6 @@
 package com.icarosantos.developer_registration_api.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class DeveloperCLTRequest extends DeveloperRequest{
 
+    @NotNull
     private LocalDate admissionDate;
 }

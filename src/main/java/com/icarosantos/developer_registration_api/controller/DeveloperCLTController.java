@@ -3,6 +3,7 @@ package com.icarosantos.developer_registration_api.controller;
 import com.icarosantos.developer_registration_api.dto.DeveloperCLTRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.service.DeveloperCLTService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class DeveloperCLTController {
     private final DeveloperCLTService developerCLTService;
 
     @PostMapping("/clt")
-    public ResponseEntity create(@RequestBody DeveloperCLTRequest developerRequest) {
+    public ResponseEntity create(@Valid @RequestBody DeveloperCLTRequest developerRequest) {
         developerCLTService.create(developerRequest);
         return ResponseEntity.status(201).build();
     }
@@ -33,7 +34,7 @@ public class DeveloperCLTController {
     }
 
     @PutMapping("/clt/{id}")
-    public ResponseEntity update(@PathVariable Long id, @RequestBody DeveloperCLTRequest developerRequest) {
+    public ResponseEntity update(@PathVariable Long id, @Valid @RequestBody DeveloperCLTRequest developerRequest) {
         developerCLTService.update(id, developerRequest);
 
         return ResponseEntity.status(200).build();
