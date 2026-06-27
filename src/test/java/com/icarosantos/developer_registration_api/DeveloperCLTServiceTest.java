@@ -1,6 +1,7 @@
 package com.icarosantos.developer_registration_api;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperCLTRequest;
+import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperCLT;
@@ -193,5 +194,61 @@ public class DeveloperCLTServiceTest {
 
         // Assert - verifica o resultado
         verify(developerCLTRepository).delete(any(DeveloperCLT.class));
+    }
+
+    @Test
+    void shouldUpdateDeveloperCLTSuccessfully() {
+        // Arrange - Monta os dados e os mocks
+        DeveloperCLTRequest developerRequest = new DeveloperCLTRequest();
+        developerRequest.setFirstName("Icaro");
+        developerRequest.setLastName("Rodrigues Santos");
+        developerRequest.setBirthDate(LocalDate.of(2006, 12, 13));
+        developerRequest.setEnterprise("Santander");
+        developerRequest.setSalary(new BigDecimal("6700"));
+        developerRequest.setTypeDeveloper(TypeDeveloper.BACK);
+        developerRequest.setVacationDate(LocalDate.of(2028, 06, 28));
+        developerRequest.setCep("06843160");
+        developerRequest.setAdmissionDate(LocalDate.of(2026, 06, 27));
+
+        ViaCepResponse viaCepResponse = new ViaCepResponse();
+        viaCepResponse.setCep("06843160");
+        viaCepResponse.setLogradouro("Rua Padre Antonio");
+        viaCepResponse.setComplemento("Casa mais bonita");
+        viaCepResponse.setBairro("Maria Auxiliadora");
+        viaCepResponse.setLocalidade("Embu das Artes");
+        viaCepResponse.setEstado("São Paulo");
+
+        Address address = new Address(
+                "06843160",
+                "Rua Padre Antonio",
+                "Casa mais bonita",
+                "Maria Auxiliadora",
+                "Embu das Artes",
+                "São Paulo");
+
+        DeveloperCLT developerCLT = DeveloperCLT.builder()
+                .id(1L)
+                .firstName("Icaro")
+                .lastName("Rodrigues")
+                .birthDate(LocalDate.of(2006, 12, 13))
+                .enterprise("AWS")
+                .salary(new BigDecimal(10000))
+                .typeDeveloper(TypeDeveloper.BACK)
+                .typeContract(TypeContract.CLT)
+                .vacationDate(LocalDate.of(2027, 07, 01))
+                .address(address)
+                .paidVacation(true)
+                .admissionDate(LocalDate.of(2026, 06, 27)).
+                thirteenSalary(true)
+                .build();
+
+        when(viaCepFacade.getAddress("06843160")).thenReturn(viaCepResponse);
+        when(developerCLTRepository.findById(1L)).thenReturn(Optional.of(developerCLT));
+
+        // Act - chama o metodo
+        developerCLTService.update(1L, developerRequest);
+
+        // Assert - verifica o resultado
+        verify(developerCLTRepository).save(any(DeveloperCLT.class));
     }
 }
