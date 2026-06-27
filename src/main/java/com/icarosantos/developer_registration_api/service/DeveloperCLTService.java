@@ -75,7 +75,8 @@ public class DeveloperCLTService {
     }
 
     public DeveloperResponse findById(Long id) {
-         DeveloperResponse developerResponse = toResponse(developerCLTRepository.findById(id).orElseThrow());
+         DeveloperResponse developerResponse = toResponse(developerCLTRepository.findById(id)
+                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado")));
          return developerResponse;
     }
 
