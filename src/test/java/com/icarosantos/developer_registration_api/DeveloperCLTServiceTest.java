@@ -11,6 +11,7 @@ import com.icarosantos.developer_registration_api.patterns.adapter.ViaCepRespons
 import com.icarosantos.developer_registration_api.patterns.facade.ViaCepFacade;
 import com.icarosantos.developer_registration_api.repository.DeveloperCLTRepository;
 import com.icarosantos.developer_registration_api.service.DeveloperCLTService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -107,5 +109,16 @@ public class DeveloperCLTServiceTest {
 
         // Assert - verifica o resultado
         assertEquals(developerResponse.getFullName(), "Icaro Rodrigues");
+    }
+
+    @Test
+    void shouldThrowExceptionWhenIdNotFound() {
+        when(developerCLTRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // Act - chama o metodo
+        // Assert - verifica o resultado
+
+        assertThrows(EntityNotFoundException.class, () ->
+                developerCLTService.findById(99L));
     }
 }
