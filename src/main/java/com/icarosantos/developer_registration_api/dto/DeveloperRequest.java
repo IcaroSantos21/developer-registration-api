@@ -36,7 +36,7 @@ public abstract class DeveloperRequest {
 
     @NotNull
     private TypeDeveloper typeDeveloper;
-    
+
     private LocalDate vacationDate;
 
     @NotBlank

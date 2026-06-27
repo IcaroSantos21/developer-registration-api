@@ -2,8 +2,12 @@ package com.icarosantos.developer_registration_api.patterns.adapter;
 
 import com.icarosantos.developer_registration_api.model.Address;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
+@NoArgsConstructor
 public class ViaCepResponse {
     private String cep;
     private String logradouro;
