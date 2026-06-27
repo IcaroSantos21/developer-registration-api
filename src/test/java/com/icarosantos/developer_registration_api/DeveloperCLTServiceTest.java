@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -113,6 +114,7 @@ public class DeveloperCLTServiceTest {
 
     @Test
     void shouldThrowExceptionWhenIdNotFound() {
+        // Arrange - Monta os dados e os mocks
         when(developerCLTRepository.findById(99L)).thenReturn(Optional.empty());
 
         // Act - chama o metodo
@@ -120,5 +122,41 @@ public class DeveloperCLTServiceTest {
 
         assertThrows(EntityNotFoundException.class, () ->
                 developerCLTService.findById(99L));
+    }
+
+    @Test
+    void shouldReturnListOfDeveloperResponseWhenFindAll() {
+        // Arrange - Monta os dados e os mocks
+        Address address = new Address(
+                "06843160",
+                "Rua Padre Antonio",
+                "Casa mais bonita",
+                "Maria Auxiliadora",
+                "Embu das Artes",
+                "São Paulo");
+
+        DeveloperCLT developerCLT = DeveloperCLT.builder()
+                .id(1L)
+                .firstName("Icaro")
+                .lastName("Rodrigues")
+                .birthDate(LocalDate.of(2006, 12, 13))
+                .enterprise("AWS")
+                .salary(new BigDecimal(10000))
+                .typeDeveloper(TypeDeveloper.BACK)
+                .typeContract(TypeContract.CLT)
+                .vacationDate(LocalDate.of(2027, 07, 01))
+                .address(address)
+                .paidVacation(true)
+                .admissionDate(LocalDate.of(2026, 06, 27)).
+                thirteenSalary(true)
+                .build();
+
+        when(developerCLTRepository.findAll()).thenReturn(List.of(developerCLT));
+
+        // Act - chama o metodo
+        var list = developerCLTService.findAll();
+
+        // Assert - verifica o resultado
+        assertEquals(1, list.size());
     }
 }
