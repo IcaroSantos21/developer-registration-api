@@ -5,15 +5,11 @@ import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperPJ;
 import com.icarosantos.developer_registration_api.model.TypeContract;
-import com.icarosantos.developer_registration_api.integration.viacep.ViaCepResponse;
-import com.icarosantos.developer_registration_api.event.DeveloperRegisteredEvent;
-import com.icarosantos.developer_registration_api.integration.viacep.ViaCepFacade;
-import com.icarosantos.developer_registration_api.service.factory.ContractFactory;
 import com.icarosantos.developer_registration_api.service.strategy.ContractStrategy;
 import com.icarosantos.developer_registration_api.repository.DeveloperPJRepository;
+import com.icarosantos.developer_registration_api.service.strategy.ContractStrategyResolver;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -27,13 +23,12 @@ import java.util.List;
 @Service
 public class DeveloperPJService {
     @Autowired
-    ViaCepFacade viaCepFacade;
-
-    @Autowired
     DeveloperPJRepository developerPJRepository;
 
     @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+    private DeveloperServiceSupport developerServiceSupport;
+    @Autowired
+    private ContractStrategyResolver contractStrategyResolver;
 
     /**
      * Cadastra um novo desenvolvedor PJ.
@@ -42,14 +37,10 @@ public class DeveloperPJService {
      * @param developerRequest dados do desenvolvedor a ser cadastrado
      */
     public void create(DeveloperPJRequest developerRequest) {
-        // Pegando o endereço do usuario
-        ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
-        Address address = viaCepResponse.toAddress();
+        Address address = developerServiceSupport.fetchAddress(developerRequest.getCep());
 
-        // Definindo o strategy
-        ContractStrategy contractStrategy = ContractFactory.create(TypeContract.PJ);
+        ContractStrategy contractStrategy = contractStrategyResolver.resolve(TypeContract.PJ);
 
-        // Pegando os dados do strategy
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
         DeveloperPJ developerPJ = DeveloperPJ.builder()
@@ -67,14 +58,9 @@ public class DeveloperPJService {
                 .paidVacation(hasPaidVacation)
                 .build();
 
-        // Salvando no repositório
         developerPJRepository.save(developerPJ);
 
-        applicationEventPublisher.publishEvent(new DeveloperRegisteredEvent(
-                developerPJ.getFirstName() + " " + developerPJ.getLastName(),
-                developerPJ.getEnterprise(),
-                developerPJ.getTypeContract()
-        ));
+        developerServiceSupport.publishRegistrationEvent(developerPJ);
     }
 
     /**
@@ -107,10 +93,10 @@ public class DeveloperPJService {
      */
     public void update(Long id, DeveloperPJRequest developerRequest) {
         DeveloperPJ developerPJ = findEntityById(id);
-        ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
-        Address address = viaCepResponse.toAddress();
 
-        ContractStrategy contractStrategy = ContractFactory.create(TypeContract.PJ);
+        Address address = developerServiceSupport.fetchAddress(developerRequest.getCep());
+
+        ContractStrategy contractStrategy = contractStrategyResolver.resolve(TypeContract.PJ);
 
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
@@ -144,7 +130,7 @@ public class DeveloperPJService {
      * @return {@link DeveloperResponse} com os dados formatados para resposta
      */
     public DeveloperResponse toResponse(DeveloperPJ developerPJ) {
-        ContractStrategy contractStrategy = ContractFactory.create(developerPJ.getTypeContract());
+        ContractStrategy contractStrategy = contractStrategyResolver.resolve(developerPJ.getTypeContract());
 
         BigDecimal totalBenefits = contractStrategy.calculateTotalBenefits(developerPJ.getSalary());
         LocalDate contractEndDate = contractStrategy.calculateContractEndDate(developerPJ.getContractStartDate(), developerPJ.getContractPeriod());

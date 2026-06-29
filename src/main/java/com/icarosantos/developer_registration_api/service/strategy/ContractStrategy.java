@@ -1,5 +1,7 @@
 package com.icarosantos.developer_registration_api.service.strategy;
 
+import com.icarosantos.developer_registration_api.model.TypeContract;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -42,4 +44,12 @@ public interface ContractStrategy {
      * @return valor total dos benefícios calculados
      */
     BigDecimal calculateTotalBenefits(BigDecimal salary);
+
+    /**
+     * Retorna o tipo de contrato suportado por esta Strategy.
+     * Utilizado pelo {@link ContractStrategyResolver} para identificar a Strategy correta.
+     *
+     * @return {@link TypeContract} suportado por esta implementação
+     */
+    TypeContract getType();
 }

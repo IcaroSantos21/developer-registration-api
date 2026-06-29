@@ -4,16 +4,17 @@ import com.icarosantos.developer_registration_api.dto.DeveloperPJRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.*;
 import com.icarosantos.developer_registration_api.integration.viacep.ViaCepResponse;
-import com.icarosantos.developer_registration_api.integration.viacep.ViaCepFacade;
 import com.icarosantos.developer_registration_api.repository.DeveloperPJRepository;
 import com.icarosantos.developer_registration_api.service.DeveloperPJService;
+import com.icarosantos.developer_registration_api.service.DeveloperServiceSupport;
+import com.icarosantos.developer_registration_api.service.strategy.ContractStrategyResolver;
+import com.icarosantos.developer_registration_api.service.strategy.PjStrategy;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,13 +31,13 @@ import static org.mockito.Mockito.when;
 public class DeveloperPJServiceTest {
 
     @Mock
-    private ViaCepFacade viaCepFacade;
+    private DeveloperServiceSupport developerServiceSupport;
+
+    @Mock
+    private ContractStrategyResolver contractStrategyResolver;
 
     @Mock
     private DeveloperPJRepository developerPJRepository;
-
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private DeveloperPJService developerPJService;
@@ -63,8 +64,10 @@ public class DeveloperPJServiceTest {
         viaCepResponse.setBairro("Maria Auxiliadora");
         viaCepResponse.setLocalidade("Embu das Artes");
         viaCepResponse.setEstado("São Paulo");
+        Address address = viaCepResponse.toAddress();
 
-        when(viaCepFacade.getAddress("06843160")).thenReturn(viaCepResponse);
+        when(contractStrategyResolver.resolve(TypeContract.PJ)).thenReturn(new PjStrategy());
+        when(developerServiceSupport.fetchAddress("06843160")).thenReturn(address);
 
         // Act - chama o metodo
         developerPJService.create(developerRequest);
@@ -100,6 +103,7 @@ public class DeveloperPJServiceTest {
                 .contractPeriod(1)
                 .build();
 
+        when(contractStrategyResolver.resolve(TypeContract.PJ)).thenReturn(new PjStrategy());
         when(developerPJRepository.findById(1L)).thenReturn(Optional.of(developerPJ));
 
         // Act - chama o metodo
@@ -148,6 +152,7 @@ public class DeveloperPJServiceTest {
                 .contractPeriod(1)
                 .build();
 
+        when(contractStrategyResolver.resolve(TypeContract.PJ)).thenReturn(new PjStrategy());
         when(developerPJRepository.findAll()).thenReturn(List.of(developerPJ));
 
         // Act - chama o metodo
@@ -240,7 +245,8 @@ public class DeveloperPJServiceTest {
                 .contractPeriod(1)
                 .build();
 
-        when(viaCepFacade.getAddress("06843160")).thenReturn(viaCepResponse);
+        when(developerServiceSupport.fetchAddress("06843160")).thenReturn(address);
+        when(contractStrategyResolver.resolve(TypeContract.PJ)).thenReturn(new PjStrategy());
         when(developerPJRepository.findById(1L)).thenReturn(Optional.of(developerPJ));
 
         // Act - chama o metodo

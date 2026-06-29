@@ -5,15 +5,11 @@ import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
 import com.icarosantos.developer_registration_api.model.Address;
 import com.icarosantos.developer_registration_api.model.DeveloperCLT;
 import com.icarosantos.developer_registration_api.model.TypeContract;
-import com.icarosantos.developer_registration_api.integration.viacep.ViaCepResponse;
-import com.icarosantos.developer_registration_api.event.DeveloperRegisteredEvent;
-import com.icarosantos.developer_registration_api.integration.viacep.ViaCepFacade;
-import com.icarosantos.developer_registration_api.service.factory.ContractFactory;
 import com.icarosantos.developer_registration_api.service.strategy.ContractStrategy;
 import com.icarosantos.developer_registration_api.repository.DeveloperCLTRepository;
+import com.icarosantos.developer_registration_api.service.strategy.ContractStrategyResolver;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,14 +21,15 @@ import java.util.List;
  */
 @Service
 public class DeveloperCLTService {
-    @Autowired
-    private ViaCepFacade viaCepFacade;
 
     @Autowired
     private DeveloperCLTRepository developerCLTRepository;
 
     @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+    private DeveloperServiceSupport developerServiceSupport;
+
+    @Autowired
+    private ContractStrategyResolver contractStrategyResolver;
 
     /**
      * Cadastra um novo desenvolvedor CLT.
@@ -41,18 +38,14 @@ public class DeveloperCLTService {
      * @param developerRequest dados do desenvolvedor a ser cadastrado
      */
     public void create(DeveloperCLTRequest developerRequest) {
-        // Pegando o endereço do usuário
-        ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
-        Address address = viaCepResponse.toAddress();
 
-        // Definindo o Strategy
-        ContractStrategy contractStrategy = ContractFactory.create(TypeContract.CLT);
+        Address address = developerServiceSupport.fetchAddress(developerRequest.getCep());
 
-        // Pegando hasThirteenSalary e o hasPaidVacation
+        ContractStrategy contractStrategy = contractStrategyResolver.resolve(TypeContract.CLT);
+
         boolean hasThirteenSalary = contractStrategy.hasThirteenSalary();
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
 
-        // Montando a entidade
         DeveloperCLT developerCLT = DeveloperCLT.builder()
                 .firstName(developerRequest.getFirstName())
                 .lastName(developerRequest.getLastName())
@@ -68,13 +61,10 @@ public class DeveloperCLTService {
                 .paidVacation(hasPaidVacation)
                 .build();
 
-        // Salvando no repository
         developerCLTRepository.save(developerCLT);
-        applicationEventPublisher.publishEvent(new DeveloperRegisteredEvent(
-                developerCLT.getFirstName() + " " + developerCLT.getLastName(),
-                developerCLT.getEnterprise(),
-                developerCLT.getTypeContract()
-        ));
+
+        developerServiceSupport.publishRegistrationEvent(developerCLT);
+
     }
 
     /**
@@ -110,10 +100,9 @@ public class DeveloperCLTService {
     public void update(Long id, DeveloperCLTRequest developerRequest) {
         DeveloperCLT developerCLT = findEntityById(id);
 
-        ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
-        Address address = viaCepResponse.toAddress();
+        Address address = developerServiceSupport.fetchAddress(developerRequest.getCep());
 
-        ContractStrategy contractStrategy = ContractFactory.create(TypeContract.CLT);
+        ContractStrategy contractStrategy = contractStrategyResolver.resolve(TypeContract.CLT);
 
         boolean hasThirteenSalary = contractStrategy.hasThirteenSalary();
         boolean hasPaidVacation = contractStrategy.hasPaidVacation();
@@ -148,7 +137,7 @@ public class DeveloperCLTService {
      * @return {@link DeveloperResponse} com os dados formatados para resposta
      */
     public DeveloperResponse toResponse(DeveloperCLT developerCLT) {
-        ContractStrategy contractStrategy = ContractFactory.create(developerCLT.getTypeContract());
+        ContractStrategy contractStrategy = contractStrategyResolver.resolve(developerCLT.getTypeContract());
 
         BigDecimal totalBenefits = contractStrategy.calculateTotalBenefits(developerCLT.getSalary());
 
