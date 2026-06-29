@@ -1,9 +1,7 @@
 package com.icarosantos.developer_registration_api.controller;
 
 import com.icarosantos.developer_registration_api.dto.DeveloperPJRequest;
-import com.icarosantos.developer_registration_api.dto.DeveloperRequest;
 import com.icarosantos.developer_registration_api.dto.DeveloperResponse;
-import com.icarosantos.developer_registration_api.model.DeveloperPJ;
 import com.icarosantos.developer_registration_api.service.DeveloperPJService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

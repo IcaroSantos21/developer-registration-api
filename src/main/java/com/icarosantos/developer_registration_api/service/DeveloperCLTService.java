@@ -9,6 +9,7 @@ import com.icarosantos.developer_registration_api.service.strategy.ContractStrat
 import com.icarosantos.developer_registration_api.repository.DeveloperCLTRepository;
 import com.icarosantos.developer_registration_api.service.strategy.ContractStrategyResolver;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,16 +21,14 @@ import java.util.List;
  * Aplica os padrões Strategy, Factory, Builder, Facade e Observer.
  */
 @Service
+@RequiredArgsConstructor
 public class DeveloperCLTService {
 
-    @Autowired
-    private DeveloperCLTRepository developerCLTRepository;
+    private final DeveloperCLTRepository developerCLTRepository;
 
-    @Autowired
-    private DeveloperServiceSupport developerServiceSupport;
+    private final DeveloperServiceSupport developerServiceSupport;
 
-    @Autowired
-    private ContractStrategyResolver contractStrategyResolver;
+    private final ContractStrategyResolver contractStrategyResolver;
 
     /**
      * Cadastra um novo desenvolvedor CLT.
