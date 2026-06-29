@@ -1,66 +1,102 @@
 # API - Cadastro de Desenvolvedores
 
-## Ideia
-Minha ideia é criar uma API Rest para cadastro de Desenvolvedores: Back-End e Front-End
-### Padrões de Projetos usados:
-- Facade - Usar para fluxos completos
-- Adapter - Adptar uma interface para que elas consigam conversar
-- Builder - Para classes que tenham muitos atributos opcionais / Construtores Globais
-- Factory Method - Quando a criação do Objeto for complexa / Quando o objetivo for desacoplar quem usa de quem cria
-- Strategy - Usar quando tiver regras diferentes
-- Observer - Para mandar logs de auditoria simples
-- Singleton - Instanciar uma única vez
+## Sobre o Projeto
+API REST para cadastro e gerenciamento de desenvolvedores Back-End e Front-End,
+desenvolvida como projeto de portfólio com foco na aplicação prática de Design Patterns.
 
-## Atributos dos Meus Devs
+## Design Patterns Aplicados
 
-### Dados pessoais
-- Nome  
-- Sobrenome
-- Data de Nascimento
+| Padrão | Onde foi aplicado |
+|---|---|
+| **Singleton** | Implícito via container IoC do Spring — todos os `@Service` e `@Repository` |
+| **Facade** | `ViaCepFacade` — abstrai a integração com a API externa ViaCEP |
+| **Adapter** | `ViaCepResponse` — mapeia os campos em português do ViaCEP para o modelo interno |
+| **Builder** | `@SuperBuilder` nas entidades `DeveloperCLT` e `DeveloperPJ` |
+| **Strategy** | `CltStrategy` e `PjStrategy` — isolam as regras de negócio por tipo de contrato |
+| **Observer** | `DeveloperRegisteredEvent` — log de auditoria disparado a cada cadastro |
 
-### Dados profissionais
-
-- Empresa
-- Salário
-- Tipo de Desenvolvedor (BACK_END, FRONT_END)
-- Tipo de Contrato (CLT, PJ)
-
-### Dados contratuais
-
-- Data de Admissão / Início do Contrato
-- Período do Contrato (em meses — exclusivo PJ)
-- Data de Férias
-
-### Endereço (via ViaCEP)
-
-- CEP
-- Logradouro
-- Bairro
-- Cidade
-- Estado
-
-## Regras de Negócio por Tipo de Contrato:
+## Regras de Negócio por Tipo de Contrato
 
 ### CLT
-- Ferias Remuneradas ✅
+- Férias Remuneradas ✅
 - 13º Salário ✅
 - Sem período de contrato definido
 
 ### PJ
 - Férias Remuneradas ✅
 - 13º Salário ❌
-- Possui período de contrato (DataInicio + PeriodoEmMeses) 
+- Possui período de contrato (DataInicio + PeriodoEmMeses)
 
-## Arquitetura Usada:
-MVC
+## Atributos dos Desenvolvedores
 
-## Dependencias:
-- Spring Web
+### Dados Pessoais
+- Nome e Sobrenome
+- Data de Nascimento
+
+### Dados Profissionais
+- Empresa
+- Salário
+- Tipo de Desenvolvedor (`BACK`, `FRONT`)
+- Tipo de Contrato (`CLT`, `PJ`)
+
+### Dados Contratuais
+- Data de Admissão (CLT) / Início do Contrato (PJ)
+- Período do Contrato em meses (exclusivo PJ)
+- Data de Férias
+
+### Endereço (via ViaCEP)
+- CEP, Logradouro, Bairro, Cidade, Estado
+
+## Tecnologias
+
+- Java 21
+- Spring Boot 3.5
 - Spring Data JPA
 - Spring Validation
-- H2 Database
+- H2 Database (in-memory)
 - Lombok
 - OpenFeign
-- SpringDoc OpenAPI
-- SpringBoot Test
-- JUnit 5
+- SpringDoc OpenAPI (Swagger)
+- JUnit 5 + Mockito
+
+## Arquitetura
+MVC com separação de responsabilidades por camadas:
+`controller` → `service` → `repository`
+
+Patterns organizados em pacotes dedicados dentro de `service`:
+- `strategy` — Strategies e Resolver
+- `integration/viacep` — Facade e Adapter
+- `event` — Observer
+
+## Como Rodar
+
+```bash
+./mvnw spring-boot:run
+```
+
+A aplicação sobe na porta `8080` com banco H2 em memória.
+
+## Documentação dos Endpoints
+
+Acesse o Swagger após subir a aplicação:
+http://localhost:8080/swagger-ui/index.html
+
+### Endpoints CLT — `/dev/clt`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/dev/clt` | Cadastrar desenvolvedor CLT |
+| GET | `/dev/clt` | Listar todos os desenvolvedores CLT |
+| GET | `/dev/clt/{id}` | Buscar desenvolvedor CLT por ID |
+| PUT | `/dev/clt/{id}` | Atualizar desenvolvedor CLT |
+| DELETE | `/dev/clt/{id}` | Deletar desenvolvedor CLT |
+
+### Endpoints PJ — `/dev/pj`
+
+| Método | Rota | Descrição |
+|---|---|---|
+| POST | `/dev/pj` | Cadastrar desenvolvedor PJ |
+| GET | `/dev/pj` | Listar todos os desenvolvedores PJ |
+| GET | `/dev/pj/{id}` | Buscar desenvolvedor PJ por ID |
+| PUT | `/dev/pj/{id}` | Atualizar desenvolvedor PJ |
+| DELETE | `/dev/pj/{id}` | Deletar desenvolvedor PJ |
