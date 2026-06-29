@@ -20,6 +20,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Serviço responsável pelo gerenciamento de desenvolvedores com contrato PJ.
+ * Aplica os padrões Strategy, Factory, Builder, Facade e Observer.
+ */
 @Service
 public class DeveloperPJService {
     @Autowired
@@ -31,6 +35,12 @@ public class DeveloperPJService {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
+    /**
+     * Cadastra um novo desenvolvedor PJ.
+     * Busca o endereço via ViaCEP, aplica as regras contratuais via Strategy e persiste no banco.
+     *
+     * @param developerRequest dados do desenvolvedor a ser cadastrado
+     */
     public void create(DeveloperPJRequest developerRequest) {
         // Pegando o endereço do usuario
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
@@ -67,15 +77,34 @@ public class DeveloperPJService {
         ));
     }
 
+    /**
+     * Busca um desenvolvedor PJ pelo seu identificador.
+     *
+     * @param id identificador do desenvolvedor
+     * @return {@link DeveloperResponse} com os dados do desenvolvedor encontrado
+     * @throws EntityNotFoundException se nenhum desenvolvedor for encontrado com o id informado
+     */
     public DeveloperResponse findById(Long id){
         return toResponse(developerPJRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado")));
     }
 
+    /**
+     * Retorna todos os desenvolvedores PJ cadastrados.
+     *
+     * @return lista de {@link DeveloperResponse} com os dados de todos os desenvolvedores PJ
+     */
     public List<DeveloperResponse> findAll() {
         var listDevelopers = developerPJRepository.findAll();
         return listDevelopers.stream().map(this::toResponse).toList();
     }
 
+    /**
+     * Atualiza os dados de um desenvolvedor PJ existente.
+     *
+     * @param id identificador do desenvolvedor a ser atualizado
+     * @param developerRequest novos dados do desenvolvedor
+     * @throws EntityNotFoundException se nenhum desenvolvedor for encontrado com o id informado
+     */
     public void update(Long id, DeveloperPJRequest developerRequest) {
         DeveloperPJ developerPJ = findEntityById(id);
         ViaCepResponse viaCepResponse = viaCepFacade.getAddress(developerRequest.getCep());
@@ -95,12 +124,25 @@ public class DeveloperPJService {
         developerPJRepository.save(developerPJ);
     }
 
+    /**
+     * Remove um desenvolvedor PJ pelo seu identificador.
+     *
+     * @param id identificador do desenvolvedor a ser removido
+     * @throws EntityNotFoundException se nenhum desenvolvedor for encontrado com o id informado
+     */
     public void delete(Long id) {
         DeveloperPJ developerPJ = findEntityById(id);
 
         developerPJRepository.delete(developerPJ);
     }
 
+    /**
+     * Converte uma entidade {@link DeveloperPJ} para um {@link DeveloperResponse}.
+     * Calcula os benefícios totais e a data de fim do contrato via Strategy.
+     *
+     * @param developerPJ entidade a ser convertida
+     * @return {@link DeveloperResponse} com os dados formatados para resposta
+     */
     public DeveloperResponse toResponse(DeveloperPJ developerPJ) {
         ContractStrategy contractStrategy = ContractFactory.create(developerPJ.getTypeContract());
 
